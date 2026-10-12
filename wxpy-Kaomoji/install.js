@@ -133,10 +133,13 @@ function install(context) {
     const customYaml = "wanxiang.custom.yaml";
     const patchConfig = `
   # ===== 颜文字功能开始 =====
+  # switches 增加颜文字开关
+  switches/+:
+    - name: kaomoji
+      states: [颜文字关, 颜文字开]
+
   # super_symbols 新增 kaomoji 类型（前缀 /kk）
-  super_symbols/triggers:
-    - { kind: sym,      exact: /sym,   label: 超级符号, marks: ["?", "/"] }
-    - { kind: emoji,    exact: /emoji, label: 超级表情, marks: ["?", "/"] }
+  super_symbols/triggers/+:
     - { kind: kaomoji,  exact: /kk,    label: 颜文字,   marks: ["?", "/"] }
   super_symbols/data_kaomoji: "lua/data/kaomoji.txt"
 
@@ -146,7 +149,26 @@ function install(context) {
 
   # 候选区直接出颜文字（输入中文词时自动追加，常驻生效）
   super_replacer/rules/+:
-    - option: true
+    - option: kaomoji
+      mode: append
+      comment_mode: none
+      tags: [abc]
+      prefix: _kk_
+      files:
+        - lua/data/kaomoji_replacer.txt
+  # ===== 颜文字功能结束 =====
+`;
+
+    const patchT9Config = `
+  # ===== 颜文字功能开始 =====
+  # switches 增加颜文字开关
+  switches/+:
+    - name: kaomoji
+      states: [颜文字关, 颜文字开]
+
+  # 候选区直接出颜文字（输入中文词时自动追加，常驻生效）
+  super_replacer/rules/+:
+    - option: kaomoji
       mode: append
       comment_mode: none
       tags: [abc]
@@ -204,19 +226,19 @@ function install(context) {
                 // 检查是否有 patch: 节点
                 if (updated.indexOf("patch:") !== -1) {
                     // 在文件末尾追加配置
-                    updated = updated.trimEnd() + "\n" + patchConfig;
+                    updated = updated.trimEnd() + "\n" + patchT9Config;
                     files.write(customT9Yaml, updated);
                     log("  ✓ 已追加配置到 wanxiang_t9.custom.yaml");
                 } else {
                     // 没有 patch: 节点，添加一个
-                    updated = updated.trimEnd() + "\n\npatch:\n" + patchConfig;
+                    updated = updated.trimEnd() + "\n\npatch:\n" + patchT9Config;
                     files.write(customT9Yaml, updated);
                     log("  ✓ 已创建 patch: 节点并添加配置");
                 }
             }
         } else {
             // 创建新的 wanxiang_t9.custom.yaml
-            const newContent = "patch:\n" + patchConfig;
+            const newContent = "patch:\n" + patchT9Config;
             files.write(customT9Yaml, newContent);
             log("  ✓ 已创建 wanxiang_t9.custom.yaml 并添加配置");
         }
