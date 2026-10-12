@@ -99,24 +99,15 @@ function uninstall(context) {
             if (configBlockPattern.test(cleaned)) {
                 cleaned = cleaned.replace(configBlockPattern, "\n");
                 log("  ✓ 已移除颜文字配置块");
+                
+                // 清理多余的空行
+                cleaned = cleaned.replace(/\n{3,}/g, "\n\n").trim();
+                
+                files.write(customYaml, cleaned);
+                log("  ✓ 配置 wanxiang.custom.yaml 已清理");
             } else {
-                // 如果没有完整的标记块，尝试逐行移除
-                const lines = cleaned.split("\n");
-                const filteredLines = lines.filter(line => {
-                    return !line.includes("kaomoji") && 
-                           !line.includes("_kk_") &&
-                           !line.includes("super_kaomoji") &&
-                           !line.includes("/kk");
-                });
-                cleaned = filteredLines.join("\n");
-                log("  ✓ 已清理颜文字相关配置");
+                log("  ! 配置块不存在，跳过");
             }
-            
-            // 清理多余的空行
-            cleaned = cleaned.replace(/\n{3,}/g, "\n\n").trim();
-            
-            files.write(customYaml, cleaned);
-            log("  ✓ 配置 wanxiang.custom.yaml 已清理");
         }
     }
 
@@ -142,24 +133,15 @@ function uninstall(context) {
                 if (configBlockPattern.test(cleaned)) {
                     cleaned = cleaned.replace(configBlockPattern, "\n");
                     log("  ✓ 已移除颜文字配置块");
+
+                    // 清理多余的空行
+                    cleaned = cleaned.replace(/\n{3,}/g, "\n\n").trim();
+    
+                    files.write(customT9Yaml, cleaned);
+                    log("  ✓ 配置 wanxiang.custom.yaml 已清理");
                 } else {
-                    // 如果没有完整的标记块，尝试逐行移除
-                    const lines = cleaned.split("\n");
-                    const filteredLines = lines.filter(line => {
-                        return !line.includes("kaomoji") &&
-                               !line.includes("_kk_") &&
-                               !line.includes("super_kaomoji") &&
-                               !line.includes("/kk");
-                    });
-                    cleaned = filteredLines.join("\n");
-                    log("  ✓ 已清理颜文字相关配置");
+                    log("  ! 配置块不存在，跳过");
                 }
-
-                // 清理多余的空行
-                cleaned = cleaned.replace(/\n{3,}/g, "\n\n").trim();
-
-                files.write(customT9Yaml, cleaned);
-                log("  ✓ 配置 wanxiang.custom.yaml 已清理");
             }
         }
     
